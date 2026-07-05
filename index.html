@@ -1,0 +1,1286 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Контест — Задачи</title>
+    <style>
+        /* Общие стили */
+        .btn-delete {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-delete:hover {
+            background-color: #c0392b;
+        }
+            
+        /* Общие стили */
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #1a1a2e;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            color: #e0e0e0;
+        }
+        .contest-container {
+            display: flex;
+            width: 100%;
+            max-width: 1400px;
+            height: 90vh;
+            background: #16213e;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            border: 1px solid #2a2a4a;
+        }
+        .task-panel {
+            width: 50%;
+            background: #1a1a2e;
+            padding: 30px;
+            overflow-y: auto;
+            border-right: 1px solid #2a2a4a;
+        }
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .task-navigation {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .nav-btn {
+            background: #374151;
+            color: #d1d5db;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.2s;
+        }
+        .nav-btn:hover { background: #4b5563; }
+        .nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+        .task-counter {
+            color: #9ca3af;
+            font-size: 14px;
+        }
+        .task-panel h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #c084fc;
+            margin-bottom: 10px;
+        }
+        .task-panel h2 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #a78bfa;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        .task-panel p {
+            font-size: 15px;
+            line-height: 1.6;
+            color: #d1d5db;
+            margin-bottom: 10px;
+        }
+        .task-panel ul {
+            margin-left: 25px;
+            margin-bottom: 10px;
+        }
+        .task-panel li {
+            font-size: 15px;
+            line-height: 1.8;
+            color: #d1d5db;
+        }
+        .examples {
+            background: #111827;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 15px;
+        }
+        .examples h3 {
+            color: #a78bfa;
+            margin-bottom: 15px;
+        }
+        .example-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        .example-box {
+            background: #0a0a1a;
+            border-radius: 8px;
+            padding: 12px 18px;
+            flex: 1;
+        }
+        .example-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #6b7280;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        .example-content {
+            font-family: 'Fira Code', monospace;
+            font-size: 14px;
+            color: #f3f4f6;
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .generated-badge {
+            display: inline-block;
+            background: #7c3aed;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+        .limits {
+            background: #111827;
+            border-radius: 12px;
+            padding: 15px 20px;
+            margin-top: 15px;
+        }
+        .limits h4 { color: #a78bfa; margin-bottom: 10px; }
+        .limits ul { list-style: none; margin: 0; }
+        .limits li { color: #9ca3af; padding: 4px 0; }
+        .difficulty-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .difficulty-easy { background: #065f46; color: #6ee7b7; }
+        .difficulty-medium { background: #92400e; color: #fbbf24; }
+        .difficulty-hard { background: #7f1d1d; color: #fca5a5; }
+        .editor-panel {
+            width: 50%;
+            display: flex;
+            flex-direction: column;
+            background: #1e1e3a;
+        }
+        .editor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 25px;
+            background: #16213e;
+            border-bottom: 1px solid #2a2a4a;
+        }
+        .editor-header h3 { color: #c084fc; }
+        .language-badge {
+            background: #7c3aed;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .code-editor-wrapper {
+            flex-grow: 1;
+            margin: 15px;
+            background: #0d1117;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #30363d;
+            display: flex;
+        }
+        .line-numbers {
+            padding: 15px 10px;
+            background: #0d1117;
+            color: #484f58;
+            font-family: 'Fira Code', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            text-align: right;
+            user-select: none;
+            border-right: 1px solid #21262d;
+            min-width: 40px;
+        }
+        textarea {
+            flex-grow: 1;
+            background: #0d1117;
+            color: #c9d1d9;
+            border: none;
+            padding: 15px;
+            font-family: 'Fira Code', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            resize: none;
+            outline: none;
+            tab-size: 4;
+        }
+        textarea::placeholder { color: #484f58; }
+        .action-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 25px;
+            background: #16213e;
+            border-top: 1px solid #2a2a4a;
+            gap: 15px;
+        }
+        .btn {
+            padding: 10px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: #7c3aed;
+            color: white;
+        }
+        .btn-primary:hover { background: #6d28d9; transform: translateY(-1px); }
+        .btn-primary:disabled {
+            background: #4c1d95;
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .btn-secondary { background: #374151; color: #d1d5db; }
+        .btn-secondary:hover { background: #4b5563; }
+        .btn-danger { background: #991b1b; color: white; }
+        .btn-danger:hover { background: #7f1d1d; transform: translateY(-1px); }
+        .btn-hint { background: #92400e; color: white; }
+        .btn-hint:hover { background: #78350f; transform: translateY(-1px); }
+        .btn-generate { background: #059669; color: white; }
+        .btn-generate:hover { background: #047857; transform: translateY(-1px); }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; justify-content: center; align-items: center; z-index: 1000; }
+        .modal-overlay.active { display: flex; }
+        .modal { background: #1e1e3a; border-radius: 16px; padding: 30px; max-width: 500px; width: 90%; border: 1px solid #2a2a4a; }
+        .modal h2 { color: #c084fc; margin-bottom: 20px; }
+        .modal label { color: #9ca3af; font-size: 13px; margin-bottom: 6px; display: block; }
+        .topic-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 20px; }
+        .topic-btn { padding: 10px; background: #111827; border: 2px solid #2a2a4a; border-radius: 10px; color: #d1d5db; cursor: pointer; font-size: 13px; transition: all 0.2s; text-align: center; }
+        .topic-btn:hover { border-color: #7c3aed; }
+        .topic-btn.selected { border-color: #7c3aed; background: #2d1b69; color: #c084fc; }
+        .difficulty-row { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+        .difficulty-row input[type=range] { flex: 1; accent-color: #7c3aed; }
+        .difficulty-value { color: #c084fc; font-weight: 700; min-width: 40px; text-align: center; }
+        .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+        .spinner { display: none; width: 20px; height: 20px; border: 3px solid #2a2a4a; border-top-color: #7c3aed; border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 8px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .results-panel {
+            margin: 0 15px 15px 15px;
+            background: #111827;
+            border-radius: 12px;
+            padding: 15px;
+            border: 1px solid #30363d;
+            display: none;
+        }
+        .results-panel.active { display: block; }
+        .verdict {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .verdict-badge {
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 14px;
+        }
+        .verdict-ok { background: #065f46; color: #6ee7b7; }
+        .verdict-wrong { background: #7f1d1d; color: #fca5a5; }
+        .test-summary {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            font-size: 13px;
+            color: #9ca3af;
+        }
+        .test-summary span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .passed-count { color: #6ee7b7; font-weight: 600; }
+        .failed-count { color: #fca5a5; font-weight: 600; }
+        .skipped-count { color: #fbbf24; font-weight: 600; }
+        .output-console {
+            background: #0a0a1a;
+            border-radius: 8px;
+            padding: 12px;
+            font-family: 'Fira Code', monospace;
+            font-size: 12px;
+            color: #9ca3af;
+            margin-top: 10px;
+            max-height: 150px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        .score-badge {
+            background: #7c3aed;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 13px;
+        }
+        
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-box {
+            background: #1e1e3a;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 700px;
+            width: 90%;
+            border: 1px solid #2a2a4a;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-box h2 { color: #fca5a5; margin-bottom: 15px; font-size: 24px; }
+        .modal-box h3 { color: #c084fc; margin: 20px 0 10px 0; font-size: 18px; }
+        .modal-box p { color: #d1d5db; margin-bottom: 15px; line-height: 1.6; }
+        .modal-box .idea-text {
+            background: #111827;
+            border-radius: 8px;
+            padding: 15px;
+            color: #d1d5db;
+            line-height: 1.8;
+            border-left: 3px solid #7c3aed;
+            margin-bottom: 20px;
+        }
+        .modal-box .idea-text ul { margin-left: 20px; margin-top: 10px; }
+        .modal-box .idea-text li { margin-bottom: 8px; }
+        .modal-box .solution-code {
+            background: #0d1117;
+            border-radius: 8px;
+            padding: 15px;
+            font-family: 'Fira Code', monospace;
+            font-size: 13px;
+            color: #c9d1d9;
+            margin-bottom: 15px;
+            white-space: pre-wrap;
+            border: 1px solid #30363d;
+            line-height: 1.6;
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        .hint-box {
+            background: #292524;
+            border-radius: 8px;
+            padding: 15px;
+            color: #fbbf24;
+            margin: 10px 15px;
+            border: 1px solid #92400e;
+            display: none;
+        }
+        .hint-box.active { display: block; }
+        .hint-box h4 { color: #fbbf24; margin-bottom: 8px; }
+        
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .loading-overlay.active { display: flex; }
+        .loading-box {
+            background: #16213e;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            color: white;
+        }
+        .spinner {
+            border: 3px solid #2a2a4a;
+            border-top: 3px solid #7c3aed;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .tasks-progress {
+            display: flex;
+            gap: 5px;
+            margin-left: 15px;
+            flex-wrap: wrap;
+        }
+        .task-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #374151;
+            cursor: pointer;
+        }
+        .task-dot.active { background: #7c3aed; }
+        .task-dot.solved { background: #065f46; }
+    </style>
+</head>
+<body>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-box">
+            <div class="spinner"></div>
+            <p id="loadingText">Загрузка...</p>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="hintModal">
+        <div class="modal-box" id="hintContent"></div>
+    </div>
+
+    <div class="modal-overlay" id="surrenderModal">
+        <div class="modal-box" id="surrenderContent"></div>
+    </div>
+
+    <!-- Модальное окно для генерации задачи -->
+    <div class="modal-overlay" id="generateModal">
+        <div class="modal">
+            <h2>🧩 Генерация задачи</h2>
+            <div>
+                <label>Тема задачи:</label>
+                <br>
+                <select id="topicSelect" style="width: 100%; padding: 10px; margin: 10px 0; border-radius: 8px; background: #111827; color: #d1d5db; border: 2px solid #2a2a4a;">
+                    <option value="Алгоритмы сортировки">Алгоритмы сортировки</option>
+                    <option value="Структуры данных">Структуры данных</option>
+                    <option value="Графы">Графы</option>
+                    <option value="Динамическое программирование">Динамическое программирование</option>
+                    <option value="Строковые алгоритмы">Строковые алгоритмы</option>
+                    <option value="Вычислительная геометрия">Вычислительная геометрия</option>
+                    <option value="Теория чисел">Теория чисел</option>
+                    <option value="Поиск в глубину/ширину">Поиск в глубину/ширину</option>
+                    <option value="Жадные алгоритмы">Жадные алгоритмы</option>
+                    <option value="Бинарный поиск">Бинарный поиск</option>
+                </select>
+            </div>
+            <div>
+                <label>Сложность: <span id="difficultyValue">50%</span></label>
+                <br>
+                <input type="range" id="difficultySlider" min="1" max="100" value="50" style="width: 100%; margin: 10px 0;">
+            </div>
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button class="btn btn-secondary" onclick="closeGenerateModal()">Отмена</button>
+                <button class="btn btn-generate" onclick="generateNewTask()" id="generateTaskButton">Создать задачу</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="contest-container">
+        <div class="task-panel" id="taskPanel"></div>
+
+        <div class="editor-panel">
+            <div class="editor-header">
+                <h3>💻 Решение (Python 3)</h3>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <span class="language-badge">Pyodide</span>
+                    <span id="scoreDisplay" class="score-badge" style="display: none;">0/100</span>
+                </div>
+            </div>
+
+            <div class="code-editor-wrapper">
+                <div class="line-numbers" id="lineNumbers">1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>10</div>
+                <textarea id="codeEditor" placeholder="# Введите ваше решение на Python..."></textarea>
+            </div>
+
+            <div class="hint-box" id="hintBox"></div>
+
+            <div class="results-panel" id="resultsPanel">
+                <div class="verdict">
+                    <span class="verdict-badge" id="verdictBadge">OK</span>
+                    <span id="verdictText" style="font-weight: 600;">Готов к запуску</span>
+                </div>
+                <div class="test-summary" id="testSummary">
+                    <span>✅ Пройдено: <span class="passed-count" id="passedCount">0</span></span>
+                    <span>❌ Провалено: <span class="failed-count" id="failedCount">0</span></span>
+                    <span>⚠️ Пропущено: <span class="skipped-count" id="skippedCount">0</span></span>
+                    <span>📊 Баллы: <strong id="scoreText">0/100</strong></span>
+                </div>
+                <div class="output-console" id="outputConsole">Нажмите "Запустить" для проверки...</div>
+            </div>
+
+            <div class="action-bar">
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-secondary" onclick="resetCode()">🔄 Сбросить</button>
+                    <button class="btn btn-hint" onclick="showHint()">💡 Подсказка</button>
+                    <button class="btn btn-danger" onclick="openSurrenderModal()">🏳️ Сдаюсь</button>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-secondary" onclick="runSampleTests()">🧪 Примеры</button>
+                    <button class="btn btn-primary" id="runButton" onclick="runAllTests()">▶️ Запустить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
+    
+    <script>
+        // ==================== Конфигурация ====================
+        let tasks = [];
+        let currentTaskIndex = 0;
+        let currentTask = null;
+        let pyodide = null;
+        let isPyodideReady = false;
+        let hasSurrendered = false;
+        let taskStates = {};
+        
+        let generatedOutputsCache = {};
+
+        // ==================== Функция для выполнения программных вставок ====================
+        function evaluateExpression(expr) {
+            if (typeof expr !== 'string') return expr;
+            
+            // Проверяем, содержит ли строка программную вставку
+            const hasExpression = /['"]\s*\+\s*[^+]+\s*\+\s*['"]/.test(expr) || 
+                                  /\.join\(/.test(expr) || 
+                                  /range\(/.test(expr) ||
+                                  /for\s+.*\s+in\s+range/.test(expr) ||
+                                  /_\s+in\s+range/.test(expr);
+            
+            if (hasExpression) {
+                try {
+                    let jsExpr = expr;
+                    
+                    // Заменяем str() на String()
+                    jsExpr = jsExpr.replace(/str\(([^)]+)\)/g, 'String($1)');
+                    
+                    // Заменяем range(stop)
+                    jsExpr = jsExpr.replace(/range\((\d+)\)/g, (match, n) => {
+                        return `Array.from({length: ${n}}, (_, i) => i)`;
+                    });
+                    
+                    // Заменяем range(start, stop)
+                    jsExpr = jsExpr.replace(/range\((\d+),\s*(\d+)\)/g, (match, start, end) => {
+                        const len = parseInt(end) - parseInt(start);
+                        return `Array.from({length: ${len}}, (_, i) => i + ${start})`;
+                    });
+                    
+                    // Заменяем for _ in range(...) на Array.from
+                    jsExpr = jsExpr.replace(/\[([^\]]+)\s+for\s+_\s+in\s+range\(([^)]+)\)\]/g, 
+                        (match, expr, range) => {
+                            return `Array.from({length: ${range}}, () => ${expr})`;
+                        });
+                    
+                    // Заменяем for i in range(...)
+                    jsExpr = jsExpr.replace(/\[([^\]]+)\s+for\s+(\w+)\s+in\s+range\(([^)]+)\)\]/g,
+                        (match, expr, varName, range) => {
+                            return `Array.from({length: ${range}}, (_, ${varName}) => ${expr})`;
+                        });
+                    
+                    // Создаём функцию и выполняем её
+                    const evalFn = new Function('return ' + jsExpr);
+                    const result = evalFn();
+                    
+                    // Если результат - массив, преобразуем в строку с пробелами
+                    if (Array.isArray(result)) {
+                        return result.join(' ');
+                    }
+                    
+                    return String(result);
+                } catch (e) {
+                    console.warn(`Ошибка выполнения выражения: ${expr.substring(0, 100)}...`, e);
+                    return expr;
+                }
+            }
+            return expr;
+        }
+
+        // ==================== Рекурсивная обработка всех строк в объекте ====================
+        function processDynamicStrings(obj) {
+            if (typeof obj === 'string') {
+                return evaluateExpression(obj);
+            } else if (Array.isArray(obj)) {
+                return obj.map(item => processDynamicStrings(item));
+            } else if (obj && typeof obj === 'object') {
+                const newObj = {};
+                for (const key in obj) {
+                    newObj[key] = processDynamicStrings(obj[key]);
+                }
+                return newObj;
+            }
+            return obj;
+        }
+
+                // ==================== Автоматическое обнаружение задач ====================
+        async function discoverTasks() {
+            try {
+                const response = await fetch('./index.json');
+                if (!response.ok) {
+                    console.error('Не удалось загрузить index.json');
+                    return [];
+                }
+                const tasks = await response.json();
+                for (const task of tasks) {
+                    if (task.examples) {
+                        task.examples = task.examples.map(ex => ({
+                            ...ex,
+                            input: processDynamicStrings(ex.input)
+                        }));
+                    }
+                    if (task.tests) {
+                        task.tests = task.tests.map(test => ({
+                            ...test,
+                            input: processDynamicStrings(test.input)
+                        }));
+                    }
+                }
+                console.log(` Всего найдено задач: ${tasks.length}`);
+                return tasks;
+            } catch (error) {
+                console.error('Ошибка загрузки index.json:', error);
+                return [];
+            }
+        }
+// ==================== Загрузка задач ====================
+        async function loadAllTasks() {
+            const overlay = document.getElementById('loadingOverlay');
+            const loadingText = document.getElementById('loadingText');
+            
+            overlay.classList.add('active');
+            loadingText.textContent = 'Поиск задач...';
+            
+            tasks = await discoverTasks();
+            
+            if (tasks.length === 0) {
+                loadingText.textContent = '❌ Не найдено ни одной задачи!';
+                setTimeout(() => overlay.classList.remove('active'), 3000);
+                return;
+            }
+            
+            tasks.forEach(task => {
+                if (!taskStates[task.id]) {
+                    taskStates[task.id] = {
+                        code: '',
+                        score: 0,
+                        hasSurrendered: false,
+                        solved: false
+                    };
+                }
+            });
+            
+            loadingText.textContent = 'Загрузка Python окружения...';
+            await initPyodide();
+            overlay.classList.remove('active');
+            
+            loadTaskToUI(0);
+            
+            console.log(`Загружено задач: ${tasks.length}`);
+        }
+
+        // ==================== Pyodide ====================
+        async function initPyodide() {
+            try {
+                pyodide = await loadPyodide({
+                    indexURL: "https://cdn.jsdelivr.net/pyodide/v0.25.0/full/"
+                });
+                isPyodideReady = true;
+                console.log('✅ Pyodide загружен успешно!');
+            } catch (error) {
+                console.error('❌ Ошибка загрузки Pyodide:', error);
+            }
+        }
+
+        async function runPythonCode(code, inputData) {
+            if (!isPyodideReady) throw new Error('Python окружение ещё не загружено');
+
+            try {
+                const escapedInput = inputData
+                    .replace(/\\/g, '\\\\')
+                    .replace(/'/g, "\\'")
+                    .replace(/\n/g, '\\n');
+                
+                pyodide.runPython(`
+import sys, io
+sys.stdin = io.StringIO('${escapedInput}')
+sys.stdout = io.StringIO()
+                `);
+
+                await pyodide.runPythonAsync(code);
+                const output = pyodide.runPython('sys.stdout.getvalue()');
+                
+                pyodide.runPython('sys.stdin = sys.__stdin__\nsys.stdout = sys.__stdout__');
+                
+                return { success: true, output: output, error: null };
+            } catch (error) {
+                try { 
+                    pyodide.runPython('sys.stdin = sys.__stdin__\nsys.stdout = sys.__stdout__'); 
+                } catch (e) {}
+                
+                return { success: false, output: '', error: error.message };
+            }
+        }
+
+        async function generateExpectedOutput(testInput, solution) {
+            if (!isPyodideReady) throw new Error('Pyodide не готов');
+            
+            const result = await runPythonCode(solution, testInput);
+            if (!result.success) {
+                throw new Error(result.error);
+            }
+            return result.output.trim();
+        }
+
+
+        // ==================== UI: Отображение задачи ====================
+        function loadTaskToUI(index) {
+            if (index < 0 || index >= tasks.length) return;
+            
+            if (currentTask) {
+                taskStates[currentTask.id].code = document.getElementById('codeEditor').value;
+            }
+            
+            currentTaskIndex = index;
+            currentTask = tasks[index];
+            const state = taskStates[currentTask.id];
+            hasSurrendered = state.hasSurrendered;
+            
+            document.getElementById('taskPanel').innerHTML = renderTaskPanel(currentTask, index);
+            
+            document.getElementById('codeEditor').value = state.code || '';
+            updateLineNumbers();
+            
+            if (state.solved) {
+                document.getElementById('scoreDisplay').style.display = 'inline-block';
+                document.getElementById('scoreDisplay').textContent = state.score + '/' + currentTask.maxScore;
+            } else {
+                document.getElementById('scoreDisplay').style.display = 'none';
+            }
+            
+            document.getElementById('hintBox').classList.remove('active');
+            hideResults();
+            
+            updateNavigation();
+        }
+
+        function renderTaskPanel(task, index) {
+            const difficultyClass = task.difficulty === 'easy' ? 'difficulty-easy' : 
+                                   task.difficulty === 'medium' ? 'difficulty-medium' : 'difficulty-hard';
+            const difficultyText = task.difficulty === 'easy' ? 'Лёгкая' : 
+                                   task.difficulty === 'medium' ? 'Средняя' : 'Сложная';
+            
+            // Безопасное извлечение полей описания (поддержка обоих форматов)
+            const desc = task.description || {};
+            const intro = task.intro || desc.intro || 'Описание отсутствует';
+            const rules = task.rules || desc.rules || [];
+            const question = task.question || desc.question || '';
+            
+            return `
+                <div class="task-header">
+                    <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+                        <div class="task-navigation">
+                            <button class="nav-btn" onclick="previousTask()" ${index === 0 ? 'disabled' : ''}>◀</button>
+                            <span class="task-counter">${index + 1} / ${tasks.length}</span>
+                            <button class="nav-btn" onclick="nextTask()" ${index === tasks.length - 1 ? 'disabled' : ''}>▶</button>
+                        </div>
+                        <span class="difficulty-badge ${difficultyClass}">${difficultyText}</span>
+                        <button class="btn btn-delete" onclick="confirmDeleteTask()" title="Удалить текущую задачу">🗑️</button>
+                        <button class="btn btn-generate" onclick="openGenerateModal()" style="margin-left: auto;">➕ Создать задачу</button>
+                    </div>
+                    <div class="tasks-progress">
+                        ${tasks.map((t, i) => `
+                            <div class="task-dot ${i === index ? 'active' : ''} ${taskStates[t.id]?.solved ? 'solved' : ''}" 
+                                 onclick="loadTaskToUI(${i})" 
+                                 title="Задача ${i + 1}: ${t.title}">
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                <h1>${task.title}</h1>
+                <p>${intro}</p>
+                <ul>
+                    ${rules.map(rule => `<li>${rule}</li>`).join('')}
+                </ul>
+                <p>${question}</p>
+                
+                <h2>Формат ввода</h2>
+                <p>${task.inputFormat}</p>
+                
+                <h2>Формат вывода</h2>
+                <p>${task.outputFormat}</p>
+                
+                <div class="examples">
+                    <h3>📋 Примеры</h3>
+                    ${(task.examples || []).map((ex, i) => `
+                        <div class="example-row">
+                            <div class="example-box">
+                                <div class="example-label">Ввод</div>
+                                <div class="example-content">${(ex.input || '').replace(/\n/g, '<br>')}</div>
+                            </div>
+                            <div class="example-box">
+                                <div class="example-label">Вывод</div>
+                                <div class="example-content">${ex.output || '?'}</div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+                
+                <div class="limits">
+                    <h4>⚙️ Ограничения</h4>
+                    <ul>
+                        <li>• Время: ${(task.constraints || {}).timeLimit || 'не указано'}</li>
+                        <li>• Память: ${(task.constraints || {}).memoryLimit || 'не указано'}</li>
+                        <li>• ${(task.constraints || {}).language || 'Python 3'}</li>
+                    </ul>
+                </div>
+                
+                <div class="limits" style="margin-top: 10px;">
+                    <h4>🏆 Система оценивания</h4>
+                    <ul>
+                        ${(task.scoring || []).map(s => `<li>• ${s.condition} → не менее ${s.points} баллов</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+        }
+
+        function updateNavigation() {
+            const dots = document.querySelectorAll('.task-dot');
+            dots.forEach((dot, i) => {
+                dot.className = 'task-dot';
+                if (i === currentTaskIndex) dot.classList.add('active');
+                if (tasks[i] && taskStates[tasks[i].id]?.solved) dot.classList.add('solved');
+            });
+        }
+
+        function nextTask() {
+            if (currentTaskIndex < tasks.length - 1) {
+                loadTaskToUI(currentTaskIndex + 1);
+            }
+        }
+
+        function previousTask() {
+            if (currentTaskIndex > 0) {
+                loadTaskToUI(currentTaskIndex - 1);
+            }
+        }
+
+        function updateLineNumbers() {
+            const editor = document.getElementById('codeEditor');
+            const lineNumbers = document.getElementById('lineNumbers');
+            const lines = editor.value.split('\n').length;
+            let html = '';
+            for (let i = 1; i <= Math.max(lines, 10); i++) {
+                html += i + '<br>';
+            }
+            lineNumbers.innerHTML = html;
+        }
+
+        function syncScroll() {
+            const editor = document.getElementById('codeEditor');
+            const lineNumbers = document.getElementById('lineNumbers');
+            lineNumbers.scrollTop = editor.scrollTop;
+        }
+
+        function resetCode() {
+            document.getElementById('codeEditor').value = '';
+            document.getElementById('hintBox').classList.remove('active');
+            updateLineNumbers();
+            hideResults();
+        }
+
+        function hideResults() {
+            document.getElementById('resultsPanel').classList.remove('active');
+        }
+
+        function showResults(verdict, details) {
+            const panel = document.getElementById('resultsPanel');
+            panel.classList.add('active');
+            
+            const badge = document.getElementById('verdictBadge');
+            const verdictText = document.getElementById('verdictText');
+            
+            if (verdict === 'OK') {
+                badge.textContent = '✓ Верно';
+                badge.className = 'verdict-badge verdict-ok';
+                verdictText.textContent = details.skipped > 0 ? 'Все выполнимые тесты пройдены!' : 'Все тесты пройдены!';
+            } else {
+                badge.textContent = '✗ Ошибка';
+                badge.className = 'verdict-badge verdict-wrong';
+                verdictText.textContent = 'Некоторые тесты не пройдены';
+            }
+            
+            document.getElementById('passedCount').textContent = details.passed;
+            document.getElementById('failedCount').textContent = details.failed;
+            document.getElementById('skippedCount').textContent = details.skipped || 0;
+            
+            const finalScore = hasSurrendered ? 0 : details.score;
+            document.getElementById('scoreText').textContent = finalScore + '/' + currentTask.maxScore;
+            
+            const scoreDisplay = document.getElementById('scoreDisplay');
+            scoreDisplay.style.display = 'inline-block';
+            scoreDisplay.textContent = finalScore + '/' + currentTask.maxScore;
+            
+            document.getElementById('outputConsole').textContent = details.log;
+            
+            taskStates[currentTask.id].score = finalScore;
+            taskStates[currentTask.id].solved = (verdict === 'OK' && !hasSurrendered);
+            taskStates[currentTask.id].hasSurrendered = hasSurrendered;
+            updateNavigation();
+        }
+
+        async function runTests(testSubset) {
+            const code = document.getElementById('codeEditor').value;
+            const runButton = document.getElementById('runButton');
+            
+            if (!code.trim()) {
+                showResults('ERROR', {
+                    passed: 0, failed: testSubset.length, skipped: 0, score: 0,
+                    log: '❌ Пустой код решения'
+                });
+                return;
+            }
+
+            if (!isPyodideReady) {
+                showResults('ERROR', {
+                    passed: 0, failed: testSubset.length, skipped: 0, score: 0,
+                    log: '❌ Python окружение ещё загружается. Подождите...'
+                });
+                return;
+            }
+
+            taskStates[currentTask.id].code = code;
+            
+            runButton.disabled = true;
+            runButton.textContent = '⏳ Выполнение...';
+            
+            let passed = 0, failed = 0, skipped = 0, totalScore = 0;
+            let logOutput = '';
+            
+            for (let i = 0; i < testSubset.length; i++) {
+                const test = testSubset[i];
+                
+                try {
+                    const cacheKey = test.group === 'Примеры' ? `example_${i}` : `test_${i}`;
+                    const expectedOutput = generatedOutputsCache[currentTask.id]?.[cacheKey];
+                    
+                    if (expectedOutput === null || expectedOutput === undefined) {
+                        logOutput += `⚠️ Тест "${test.group}": ПРОПУЩЕН - нет эталонного ответа\n\n`;
+                        skipped++;
+                        continue;
+                    }
+                    
+                    const result = await runPythonCode(code, test.input);
+                    
+                    if (!result.success) {
+                        logOutput += `❌ Тест "${test.group}": ОШИБКА ВЫПОЛНЕНИЯ\n${result.error}\n\n`;
+                        failed++;
+                        continue;
+                    }
+                    
+                    const actualOutput = result.output.trim();
+                    
+                    if (actualOutput === expectedOutput) {
+                        logOutput += `✅ Тест "${test.group}": пройден (+${test.points} баллов)\n`;
+                        passed++;
+                        totalScore += test.points;
+                    } else {
+                        logOutput += `❌ Тест "${test.group}": ожидалось "${expectedOutput}", получено "${actualOutput}"\n`;
+                        failed++;
+                    }
+                } catch (error) {
+                    logOutput += `⚠️ Тест "${test.group}": КРИТИЧЕСКАЯ ОШИБКА\n${error.message}\n\n`;
+                    skipped++;
+                }
+            }
+            
+            const verdict = (failed === 0) ? 'OK' : 'WA';
+            
+            showResults(verdict, {
+                passed, failed, skipped, score: totalScore,
+                log: logOutput || 'Нет тестов для выполнения'
+            });
+
+            runButton.disabled = false;
+            runButton.textContent = '▶️ Запустить';
+        }
+
+        function runSampleTests() {
+            if (!currentTask) return;
+            const sampleTests = currentTask.tests.filter(t => t.group === 'Примеры');
+            runTests(sampleTests);
+        }
+
+        function runAllTests() {
+            if (!currentTask) return;
+            runTests(currentTask.tests);
+        }
+
+        function showHint() {
+            if (!currentTask) return;
+            
+            document.getElementById('hintBox').innerHTML = `
+                <h4>💡 Подсказка</h4>
+                <p>${currentTask.hint.short}</p>
+            `;
+            document.getElementById('hintBox').classList.add('active');
+            
+            if (currentTask.hint.full) {
+                const hint = currentTask.hint.full;
+                document.getElementById('hintContent').innerHTML = `
+                    <h2 style="color: #fbbf24;">💡 Подсказка</h2>
+                    <h3>Ключевая идея:</h3>
+                    <div class="idea-text"><p>${hint.keyIdea}</p></div>
+                    <h3>План решения:</h3>
+                    <div class="idea-text">
+                        <ol>${hint.steps.map(step => `<li>${step}</li>`).join('')}</ol>
+                    </div>
+                    <p style="color: #fbbf24;">⚠️ ${hint.warning}</p>
+                    <div class="modal-buttons">
+                        <button class="btn btn-secondary" onclick="closeHintModal()">Понятно, попробую!</button>
+                    </div>
+                `;
+                document.getElementById('hintModal').classList.add('active');
+            }
+        }
+
+        function closeHintModal() {
+            document.getElementById('hintModal').classList.remove('active');
+        }
+
+        function openSurrenderModal() {
+            if (!currentTask) return;
+            
+            document.getElementById('surrenderContent').innerHTML = `
+                <h2>⚠️ Вы уверены?</h2>
+                <p>Вы собираетесь посмотреть полное решение. Это действие <strong>обнулит ваши баллы</strong> за эту задачу.</p>
+                <div id="fullSolution" style="display: none;">
+                    <h3>💡 Идея решения:</h3>
+                    <div class="idea-text">
+                        <p><strong>${currentTask.solutionExplanation.idea}</strong></p>
+                        <p>${currentTask.solutionExplanation.why}</p>
+                        <p><strong>Сложность:</strong> ${currentTask.solutionExplanation.complexity}</p>
+                    </div>
+                    <h3>📝 Решение:</h3>
+                    <div class="solution-code">${currentTask.solution}</div>
+                </div>
+                <div class="modal-buttons">
+                    <button class="btn btn-secondary" onclick="closeSurrenderModal()">Отмена</button>
+                    <button class="btn btn-danger" id="showSolutionBtn" onclick="showSolution()">Показать решение</button>
+                </div>
+            `;
+            document.getElementById('surrenderModal').classList.add('active');
+        }
+
+        function closeSurrenderModal() {
+            document.getElementById('surrenderModal').classList.remove('active');
+        }
+
+        function showSolution() {
+            hasSurrendered = true;
+            if (currentTask) taskStates[currentTask.id].hasSurrendered = true;
+            
+            document.getElementById('fullSolution').style.display = 'block';
+            document.getElementById('showSolutionBtn').style.display = 'none';
+            
+            document.getElementById('outputConsole').textContent = '⚠️ Вы посмотрели правильное решение. Баллы обнулены.';
+            document.getElementById('resultsPanel').classList.add('active');
+            document.getElementById('verdictBadge').textContent = '🏳️ Сдался';
+            document.getElementById('verdictBadge').className = 'verdict-badge verdict-wrong';
+            document.getElementById('verdictText').textContent = 'Решение показано';
+            document.getElementById('scoreDisplay').style.display = 'inline-block';
+            document.getElementById('scoreDisplay').textContent = '0/' + (currentTask ? currentTask.maxScore : 100);
+            document.getElementById('scoreText').textContent = '0/' + (currentTask ? currentTask.maxScore : 100);
+        }
+
+        // ==================== Генерация задач ====================
+                function openGenerateModal() {
+                    document.getElementById('generateModal').classList.add('active');
+                }
+
+                function closeGenerateModal() {
+                    document.getElementById('generateModal').classList.remove('active');
+                }
+
+                async function generateNewTask() {
+                    const topic = document.getElementById('topicSelect').value;
+                    const difficulty = parseInt(document.getElementById('difficultySlider').value);
+            
+                    const button = document.getElementById('generateTaskButton');
+                    const originalText = button.textContent;
+            
+                    // Блокируем кнопку и показываем индикатор загрузки
+                    button.disabled = true;
+                    button.textContent = '⏳ Генерация...';
+            
+                    try {
+                        // Отправляем запрос на сервер
+                        const response = await fetch('/api/generate', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                topic: topic,
+                                difficulty: difficulty
+                            })
+                        });
+                
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                
+                        const data = await response.json();
+                        const newTask = data.task;
+                        
+                        if (!newTask) {
+                            throw new Error(data.error || 'Сервер не вернул задачу');
+                        }
+                
+                        // Добавляем новую задачу в массив
+                        tasks.push(newTask);
+                
+                        // Инициализируем состояние для новой задачи
+                        taskStates[newTask.id] = {
+                            code: '',
+                            score: 0,
+                            hasSurrendered: false,
+                            solved: false
+                        };
+                
+                        // Закрываем модальное окно
+                        closeGenerateModal();
+                
+                        // Переключаемся на новую задачу (последнюю в списке)
+                        loadTaskToUI(tasks.length - 1);
+                        updateNavigation();
+                
+                        alert('✅ Задача "' + newTask.title + '" успешно создана!');
+                
+                    } catch (error) {
+                        console.error('Ошибка при генерации задачи:', error);
+                        alert('❌ Произошла ошибка при генерации задачи. Проверьте консоль разработчика (F12).\\n\\nДетали: ' + error.message);
+                    } finally {
+                        // Восстанавливаем кнопку
+                        button.disabled = false;
+                        button.textContent = originalText;
+                    }
+                }
+
+                // Глобальная переменная для отслеживания текущей задачи
+                let currentTaskIndex = 0;
+
+                // Функция удаления задачи
+                async function confirmDeleteTask() {
+                    if (!tasks || tasks.length === 0) {
+                        alert('❌ Нет задач для удаления');
+                        return;
+                    }
+
+                    const currentTask = tasks[currentTaskIndex];
+                    const confirmMessage = '⚠️ Вы уверены, что хотите удалить задачу "' + currentTask.title + '"?\n\nЭто действие нельзя отменить.';
+
+                    if (!confirm(confirmMessage)) {
+                        return;
+                    }
+
+                    try {
+                        const response = await fetch('/api/tasks/' + encodeURIComponent(currentTask.id), {
+                            method: 'DELETE',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        });
+
+                        if (!response.ok) {
+                            const errorData = await response.json();
+                            throw new Error(errorData.error || 'HTTP error! status: ' + response.status);
+                        }
+
+                        tasks.splice(currentTaskIndex, 1);
+                        
+                        if (currentTask.id) {
+                            delete taskStates[currentTask.id];
+                        }
+
+                        if (tasks.length > 0) {
+                            const newIndex = Math.min(currentTaskIndex, tasks.length - 1);
+                            loadTaskToUI(newIndex);
+                        } else {
+                            document.getElementById('taskPanel').innerHTML = '<p>Нет доступных задач. Создайте новую задачу.</p>';
+                        }
+                        
+                        updateNavigation();
+                        alert('✅ Задача успешно удалена!');
+                    } catch (error) {
+                        console.error('Ошибка при удалении задачи:', error);
+                        alert('❌ Произошла ошибка при удалении задачи. Проверьте консоль разработчика.');
+                    }
+                }
+
+                document.addEventListener('DOMContentLoaded', () => {
+                    const editor = document.getElementById('codeEditor');
+            
+                    // Обработчик для ползунка сложности
+                    const difficultySlider = document.getElementById('difficultySlider');
+                    const difficultyValue = document.getElementById('difficultyValue');
+                    if (difficultySlider && difficultyValue) {
+                        difficultySlider.addEventListener('input', function() {
+                            difficultyValue.textContent = this.value + '%';
+                        });
+                    }
+            
+                    updateLineNumbers();
+                    editor.addEventListener('scroll', syncScroll);
+                    editor.addEventListener('input', updateLineNumbers);
+            
+                    editor.addEventListener('keydown', (e) => {
+                        if (e.key === 'Tab') {
+                            e.preventDefault();
+                            const start = editor.selectionStart;
+                            const end = editor.selectionEnd;
+                            editor.value = editor.value.substring(0, start) + '    ' + editor.value.substring(end);
+                            editor.selectionStart = editor.selectionEnd = start + 4;
+                            updateLineNumbers();
+                        }
+                    });
+
+                    loadAllTasks();
+                });
+    </script>
+</body>
+</html>

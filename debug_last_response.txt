@@ -1,0 +1,66 @@
+{
+  "id": 1234,
+  "title": "Степень вершины",
+  "difficulty": "easy",
+  "maxScore": 100,
+  "description": {
+    "intro": "Дан простой неориентированный граф без петель и кратных ребер.",
+    "rules": [
+      "Граф задаётся списком ребер.",
+      "Вершины нумеруются с 1.",
+      "Гарантируется, что все ребра корректны."
+    ],
+    "question": "Для заданной вершины K выведите её степень (количество рёбер, инцидентных этой вершине)."
+  },
+  "inputFormat": "Первая строка: два целых числа N и M (количество вершин и рёбер). Затем M строк, каждая содержит два целых числа u и v — концы ребра. Последняя строка: одно целое число K (1 ≤ K ≤ N).",
+  "outputFormat": "Выведите одно целое число — степень вершины K.",
+  "examples": [
+    { "input": "4 3\n1 2\n2 3\n3 4\n2", "output": "" },
+    { "input": "3 2\n1 2\n2 3\n1", "output": "" },
+    { "input": "5 4\n1 2\n2 3\n3 4\n4 5\n3", "output": "" },
+    { "input": "2 1\n1 2\n1", "output": "" }
+  ],
+  "constraints": {
+    "timeLimit": "1 секунда",
+    "memoryLimit": "256 MB",
+    "language": "Python 3"
+  },
+  "scoring": [
+    { "condition": "Примеры", "points": 0 },
+    { "condition": "Основные тесты", "points": 60 },
+    { "condition": "Граничные случаи", "points": 40 }
+  ],
+  "tests": [
+    { "input": "6 5\n1 2\n2 3\n3 4\n4 5\n5 6\n2", "points": 10, "group": "Основные", "expected_output": "" },
+    { "input": "3 2\n1 2\n2 3\n2", "points": 10, "group": "Основные", "expected_output": "" },
+    { "input": "4 3\n1 2\n1 3\n1 4\n1", "points": 10, "group": "Основные", "expected_output": "" },
+    { "input": "7 6\n1 2\n2 3\n3 4\n4 5\n5 6\n6 7\n4", "points": 10, "group": "Основные", "expected_output": "" },
+    { "input": "5 4\n1 2\n2 3\n3 4\n4 5\n5", "points": 10, "group": "Основные", "expected_output": "" },
+    { "input": "8 10\n1 2\n2 3\n3 4\n4 5\n5 6\n6 7\n7 8\n1 8\n2 7\n3 6\n3", "points": 10, "group": "Основные", "expected_output": "" },
+    { "input": "1 0\n1", "points": 10, "group": "Граничные", "expected_output": "" },
+    { "input": "10 9\n1 2\n2 3\n3 4\n4 5\n5 6\n6 7\n7 8\n8 9\n9 10\n10", "points": 10, "group": "Граничные", "expected_output": "" },
+    { "input": "3 3\n1 2\n2 3\n3 1\n1", "points": 10, "group": "Граничные", "expected_output": "" },
+    { "input": "6 7\n1 2\n2 3\n3 4\n4 5\n5 6\n6 1\n1 4\n5", "points": 10, "group": "Граничные", "expected_output": "" }
+  ],
+  "solution": "import sys\n\ndef main():\n    data = sys.stdin.read().strip().split()\n    if not data:\n        return\n    it = iter(data)\n    N = int(next(it))\n    M = int(next(it))\n    deg = [0] * (N + 1)\n    for _ in range(M):\n        u = int(next(it))\n        v = int(next(it))\n        deg[u] += 1\n        deg[v] += 1\n    K = int(next(it))\n    print(deg[K])\n\nif __name__ == \"__main__\":\n    main()",
+  "hint": {
+    "short": "Создайте массив степеней размером N+1 и увеличивайте соответствующие элементы для каждого ребра.",
+    "full": {
+      "keyIdea": "Степень вершины — количество ребер, касающихся её. Подсчитывается простым обходом списка ребер.",
+      "steps": [
+        "Создайте список deg длины N+1, заполненный нулями.",
+        "Для каждого ребра (u,v) увеличивайте deg[u] и deg[v] на 1.",
+        "После обработки всех ребер ответом будет deg[K]."
+      ],
+      "warning": "Убедитесь, что вы правильно обрабатываете ввод: сначала N и M, затем M пар, затем K."
+    }
+  },
+  "solutionExplanation": {
+    "idea": "Подсчет степени вершины в неориентированном графе. Для каждого ребра увеличиваем счетчики двух инцидентных вершин.",
+    "why": "Это прямой перебор ребер, сложность O(M). Поскольку M мало, метод эффективен.",
+    "complexity": "O(N+M) по времени, O(N) по памяти.",
+    "examples": [
+      "Граф из примера 1: ребра (1-2), (2-3), (3-4), степень вершины 2 равна 2 (соединена с 1 и 3)."
+    ]
+  }
+}
