@@ -139,6 +139,42 @@ def run_code_against_tests(code, tests):
                 cwd=tempfile.mkdtemp()  # Изолированная директория
             )
             os.unlink(temp_file)  # Удаляем временный файл
+def run_code_against_tests(code, tests):
+    """ Запускает код пользователя на тестах задачи. Возвращает список результатов по каждому тесту. """
+    # Безопасность: запрещаем опасные операции
+    forbidden = ['__import__', 'eval', 'exec', 'open', 'file', 'input', 'raw_input']
+    for word in forbidden:
+        if word in code:
+            return [{
+                'test_index': 0,
+                'passed': False,
+                'input': '',
+                'expected': '',
+                'actual': '',
+                'error': f'Обнаружена запрещённая конструкция: {word}',
+                'points': 0,
+                'group': 'Основные'
+            }]
+
+    results = []
+    for i, test in enumerate(tests):
+        test_input = test.get('input', '')
+        expected = str(test.get('expected_output', '')).strip()
+        try:
+            # Используем временный файл для изоляции
+            with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False) as f:
+                f.write(code)
+                temp_file = f.name
+
+            proc = subprocess.run(
+                [sys.executable, temp_file],
+                input=test_input,
+                capture_output=True,
+                text=True,
+                timeout=5,
+                cwd=tempfile.mkdtemp()
+            )
+            os.unlink(temp_file)
 
             actual = proc.stdout.strip()
             stderr = proc.stderr.strip()
@@ -171,7 +207,7 @@ def run_code_against_tests(code, tests):
                     'input': test_input,
                     'expected': expected,
                     'actual': actual,
-                    'error': f'Ожидалось {expected}, получено {actual}',
+                    'error': f'Ожидалось: {expected!r}, получено: {actual!r}',
                     'points': test.get('points', 0),
                     'group': test.get('group', 'Основные')
                 })
@@ -182,7 +218,7 @@ def run_code_against_tests(code, tests):
                 'input': test_input,
                 'expected': expected,
                 'actual': '',
-                'error': 'Превышено время выполнения (5 секунд)',
+                'error': 'Превышен лимит времени (5 секунд)',
                 'points': test.get('points', 0),
                 'group': test.get('group', 'Основные')
             })
@@ -193,25 +229,11 @@ def run_code_against_tests(code, tests):
                 'input': test_input,
                 'expected': expected,
                 'actual': '',
-                'error': f'Ошибка выполнения: {str(e)}',
+                'error': str(e),
                 'points': test.get('points', 0),
                 'group': test.get('group', 'Основные')
             })
     return results
-    return results
-
-
-# ============================================================
-# ЭНДПОИНТЫ
-# ============================================================
-
-@app.route('/')
-def index():
-    """Отдача главной страницы"""
-    return send_from_directory(
-        BASE_DIR, 'index.html'
-    )
-
 
 @app.route('/index.json')
 def serve_index_json():
