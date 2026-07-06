@@ -69,7 +69,6 @@ def load_tasks():
             except json.JSONDecodeError:
                 pass
     return all_tasks
-    
     return all_tasks
 
 
@@ -98,16 +97,13 @@ def save_generated_task(task_data):
 
 def run_code_against_tests(code, tests):
     """
-    Запускает код пользователя на тестах задачи.
-    Возвращает список результатов по каждому тесту.
-    """
-    results = []
-    
 def run_code_against_tests(code, tests):
     """ Запускает код пользователя на тестах задачи. Возвращает список результатов по каждому тесту. """
     # Безопасность: запрещаем опасные операции
     forbidden = ['__import__', 'eval', 'exec', 'open', 'file', 'input', 'raw_input']
     for word in forbidden:
+        if word in code:
+            return [{ 'test_index': 0, 'passed': False, 'input': '', 'expected': '', 'actual': '',
         if word in code:
             return [{
                 'test_index': 0,
