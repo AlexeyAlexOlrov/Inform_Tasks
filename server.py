@@ -248,7 +248,7 @@ def generate():
 
 
 @app.route('/api/tasks/<task_id>', methods=['DELETE'])
-def delete_task(task_id):
+def delete_task_by_id(task_id):
     """Удаление задачи по ID из index.json"""
     if not os.path.exists(INDEX_JSON_PATH):
         return jsonify({'error': 'Файл с задачами не найден'}), 404
@@ -278,7 +278,7 @@ def delete_task(task_id):
 
 
 @app.route('/api/tasks/<task_id>', methods=['DELETE'])
-def delete_task(task_id):
+def delete_task_by_id(task_id):
     """Удаление задачи по ID"""
     try:
         # Загружаем существующие задачи
