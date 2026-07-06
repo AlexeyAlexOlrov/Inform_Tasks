@@ -42,12 +42,10 @@
   'expected': expected, 'actual': actual, 'error': None, 'points': 
  test.get('points', 0), 'group': test.get('group', 'Основные') }) else: 
  results.append({ 'test_index': i, 'passed': False, 'input': test_input, 
- 'expected': expected, 'actual': actual, 'error': f'Ожидалось: {expected!r}, 
- получено: {actual!r}', 'points': test.get('points', 0), 'group': 
+ 'expected': expected, 'actual': actual, 'error': f'Ожидалось: {expected!r}, получено: {actual!r}', 'points': test.get('points', 0), 'group': 
  test.get('group', 'Основные') }) except subprocess.TimeoutExpired: 
  results.append({ 'test_index': i, 'passed': False, 'input': test_input, 
- 'expected': expected, 'actual': '', 'error': 'Превышен лимит времени (5 
- секунд)', 'points': test.get('points', 0), 'group': test.get('group', 
+ 'expected': expected, 'actual': '', 'error': 'Превышен лимит времени (5 секунд)', 'points': test.get('points', 0), 'group': test.get('group', 
  'Основные') }) except Exception as e: results.append({ 'test_index': i, 
  'passed': False, 'input': test_input, 'expected': expected, 'actual': '', 
  'error': str(e), 'points': test.get('points', 0), 'group': test.get('group', 
