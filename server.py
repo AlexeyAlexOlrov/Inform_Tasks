@@ -33,30 +33,42 @@ TASKS_JSON_PATH = os.path.join(BASE_DIR, 'tasks.json')
 # ============================================================
 
 def load_tasks():
+def load_tasks():
     """Загружает все задачи (index.json + tasks.json)"""
     all_tasks = []
-    
+    seen_ids = set()
     # index.json — полные задачи (с тестами)
     if os.path.exists(INDEX_JSON_PATH):
         with open(INDEX_JSON_PATH, 'r', encoding='utf-8') as f:
             try:
                 data = json.load(f)
                 if isinstance(data, list):
-                    all_tasks.extend(data)
+                    for task in data:
+                        task_id = str(task.get('id', ''))
+                        if task_id not in seen_ids:
+                            seen_ids.add(task_id)
+                            all_tasks.append(task)
                 elif isinstance(data, dict):
-                    all_tasks.append(data)
+                    task_id = str(data.get('id', ''))
+                    if task_id not in seen_ids:
+                        seen_ids.add(task_id)
+                        all_tasks.append(data)
             except json.JSONDecodeError:
                 pass
-    
     # tasks.json — задачи с решениями
     if os.path.exists(TASKS_JSON_PATH):
         with open(TASKS_JSON_PATH, 'r', encoding='utf-8') as f:
             try:
                 data = json.load(f)
                 if isinstance(data, list):
-                    all_tasks.extend(data)
+                    for task in data:
+                        task_id = str(task.get('id', ''))
+                        if task_id not in seen_ids:
+                            seen_ids.add(task_id)
+                            all_tasks.append(task)
             except json.JSONDecodeError:
                 pass
+    return all_tasks
     
     return all_tasks
 
@@ -91,23 +103,45 @@ def run_code_against_tests(code, tests):
     """
     results = []
     
+def run_code_against_tests(code, tests):
+    """ Запускает код пользователя на тестах задачи. Возвращает список результатов по каждому тесту. """
+    # Безопасность: запрещаем опасные операции
+    forbidden = ['__import__', 'eval', 'exec', 'open', 'file', 'input', 'raw_input']
+    for word in forbidden:
+        if word in code:
+            return [{
+                'test_index': 0,
+                'passed': False,
+                'input': '',
+                'expected': '',
+                'actual': '',
+                'error': f'Обнаружена запрещённая конструкция: {word}',
+                'points': 0,
+                'group': 'Основные'
+            }]
+
+    results = []
     for i, test in enumerate(tests):
         test_input = test.get('input', '')
         expected = str(test.get('expected_output', '')).strip()
-        
         try:
+            # Используем временный файл для изоляции
+            with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False) as f:
+                f.write(code)
+                temp_file = f.name
+
             proc = subprocess.run(
-                [sys.executable, '-c', code],
+                [sys.executable, temp_file],
                 input=test_input,
                 capture_output=True,
                 text=True,
                 timeout=5,
-                cwd=tempfile.gettempdir()
+                cwd=tempfile.mkdtemp()  # Изолированная директория
             )
-            
+            os.unlink(temp_file)  # Удаляем временный файл
+
             actual = proc.stdout.strip()
             stderr = proc.stderr.strip()
-            
             if proc.returncode != 0:
                 results.append({
                     'test_index': i,
@@ -137,7 +171,7 @@ def run_code_against_tests(code, tests):
                     'input': test_input,
                     'expected': expected,
                     'actual': actual,
-                    'error': f'Ожидалось: {expected!r}, получено: {actual!r}',
+                    'error': f'Ожидалось {expected}, получено {actual}',
                     'points': test.get('points', 0),
                     'group': test.get('group', 'Основные')
                 })
@@ -148,7 +182,7 @@ def run_code_against_tests(code, tests):
                 'input': test_input,
                 'expected': expected,
                 'actual': '',
-                'error': 'Превышен лимит времени (5 секунд)',
+                'error': 'Превышено время выполнения (5 секунд)',
                 'points': test.get('points', 0),
                 'group': test.get('group', 'Основные')
             })
@@ -159,11 +193,11 @@ def run_code_against_tests(code, tests):
                 'input': test_input,
                 'expected': expected,
                 'actual': '',
-                'error': str(e),
+                'error': f'Ошибка выполнения: {str(e)}',
                 'points': test.get('points', 0),
                 'group': test.get('group', 'Основные')
             })
-    
+    return results
     return results
 
 
@@ -282,31 +316,7 @@ def delete_task(task_id):
     """Удаление задачи по ID"""
     try:
         # Загружаем существующие задачи
-        all_tasks = []
-        if os.path.exists(INDEX_JSON_PATH):
-            with open(INDEX_JSON_PATH, 'r', encoding='utf-8') as f:
-                try:
-                    all_tasks = json.load(f)
-                    if not isinstance(all_tasks, list):
-                        all_tasks = [all_tasks]
-                except json.JSONDecodeError:
-                    all_tasks = []
 
-        # Фильтруем задачи, исключая ту, которую нужно удалить
-        updated_tasks = [task for task in all_tasks if str(task.get('id')) != str(task_id)]
-
-        # Если количество задач не изменилось, значит задача не была найдена
-        if len(updated_tasks) == len(all_tasks):
-            return jsonify({'error': f'Задача с id={task_id} не найдена'}), 404
-
-        # Сохраняем обновленный список задач
-        with open(INDEX_JSON_PATH, 'w', encoding='utf-8') as f:
-            json.dump(updated_tasks, f, ensure_ascii=False, indent=2)
-
-        return jsonify({'message': f'Задача с id={task_id} успешно удалена'})
-
-    except Exception as e:
-        return jsonify({'error': f'Ошибка при удалении задачи: {str(e)}'}), 500
 
 
 @app.route('/api/submit', methods=['POST'])
