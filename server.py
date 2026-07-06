@@ -278,8 +278,8 @@ def delete_task_by_id(task_id):
 
 
 @app.route('/api/tasks/<task_id>', methods=['DELETE'])
-def delete_task_by_id(task_id):
-    """Удаление задачи по ID"""
+def delete_task_by_id_old(task_id):
+    """Удалить задачу по ID (старая версия)"""
     try:
         # Загружаем существующие задачи
         all_tasks = []
